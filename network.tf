@@ -21,7 +21,7 @@ resource "oci_core_route_table" "public_rt" {
   vcn_id         = oci_core_vcn.main_vcn.id
   display_name   = "publicRT-tf"
 
-# ADD RULES FOR THAT PUBLIC-ROUTE-TABLE
+  # ADD RULES FOR THAT PUBLIC-ROUTE-TABLE
   route_rules {
     destination       = "0.0.0.0/0"
     destination_type  = "CIDR_BLOCK"
@@ -72,14 +72,14 @@ resource "oci_core_security_list" "public_security_list" {
 
 #CREATING PUBLIC-SUBNET
 resource "oci_core_subnet" "public_subnet" {
-  compartment_id      = var.compartment_ocid
-  vcn_id              = oci_core_vcn.main_vcn.id
-  cidr_block          = "10.0.1.0/24"
-  display_name        = "public-subnet-tf"
-  dns_label           = "publicsubnet"
+  compartment_id             = var.compartment_ocid
+  vcn_id                     = oci_core_vcn.main_vcn.id
+  cidr_block                 = "10.0.1.0/24"
+  display_name               = "public-subnet-tf"
+  dns_label                  = "publicsubnet"
   prohibit_public_ip_on_vnic = false
 
-  route_table_id      = oci_core_route_table.public_rt.id
+  route_table_id = oci_core_route_table.public_rt.id
 
   security_list_ids = [
     oci_core_security_list.public_security_list.id
@@ -244,10 +244,10 @@ resource "oci_core_instance" "application_node1" {
   }
 
   create_vnic_details {
-    subnet_id              = oci_core_subnet.private_subnet.id
-    assign_public_ip       = false
-    display_name           = "application-vnic"
-    hostname_label         = "appnode1"
+    subnet_id        = oci_core_subnet.private_subnet.id
+    assign_public_ip = false
+    display_name     = "application-vnic"
+    hostname_label   = "appnode1"
   }
 
   source_details {
@@ -263,23 +263,23 @@ resource "oci_core_instance" "application_node1" {
 # CREATE AUTONOMOUS DATABASE
 resource "oci_database_autonomous_database" "autonomous_db_tf" {
   compartment_id = var.compartment_ocid
-  display_name = "autonomous_db_tf"
-  db_name = "MYAUTONOMOUSDBTF"
-  db_workload = "OLTP"
+  display_name   = "autonomous_db_tf"
+  db_name        = "MYAUTONOMOUSDBTF"
+  db_workload    = "OLTP"
   admin_password = "Oracle123456"
-  is_free_tier = true
+  is_free_tier   = true
 }
 
 # DOWNLOAD AUTONOMOUS DB WALLET
 resource "oci_database_autonomous_database_wallet" "adb_wallet" {
   autonomous_database_id = oci_database_autonomous_database.autonomous_db_tf.id
-  password = "Oracle@123456"
-  base64_encode_content = true
+  password               = "Oracle@123456"
+  base64_encode_content  = true
 }
 
 # SAVE WALLET ZIP LOCALLY
 resource "local_file" "wallet_zip" {
-  filename = "C:/terraform/oci-3tier/wallet.zip"
+  filename       = "C:/terraform/oci-3tier/wallet.zip"
   content_base64 = oci_database_autonomous_database_wallet.adb_wallet.content
 }
 
@@ -312,11 +312,11 @@ data "oci_objectstorage_namespace" "ns" {
 # CREATE PRE-AUTHENTICATED REQUEST (PAR)
 
 resource "oci_objectstorage_preauthrequest" "wallet_par" {
-  namespace = data.oci_objectstorage_namespace.ns.namespace
-  bucket = oci_objectstorage_bucket.tf_bucket.name
-  name = "wallet-par"
-  access_type = "ObjectRead"
-  object_name = oci_objectstorage_object.wallet_upload.object
+  namespace    = data.oci_objectstorage_namespace.ns.namespace
+  bucket       = oci_objectstorage_bucket.tf_bucket.name
+  name         = "wallet-par"
+  access_type  = "ObjectRead"
+  object_name  = oci_objectstorage_object.wallet_upload.object
   time_expires = "2030-12-31T23:59:59Z"
 }
 
@@ -324,7 +324,7 @@ resource "oci_objectstorage_preauthrequest" "wallet_par" {
 
 resource "local_file" "par_url_file" {
   filename = "C:/terraform/oci-3tier/par-url.txt"
-  content = "https://objectstorage.ap-sydney-1.oraclecloud.com${oci_objectstorage_preauthrequest.wallet_par.access_uri}"
+  content  = "https://objectstorage.ap-sydney-1.oraclecloud.com${oci_objectstorage_preauthrequest.wallet_par.access_uri}"
 }
 
 # CREATE LOAD BALANCER
@@ -401,94 +401,94 @@ resource "null_resource" "bastion_to_private_test" {
 
   provisioner "remote-exec" {
 
-inline = [
-  "ping google.com -c 1",
-  "mkdir -p ~/.ssh",
-  "echo '${file("C:/Users/nvino/.ssh/id_rsa")}' > ~/.ssh/private_key",
-  "chmod 600 ~/.ssh/private_key",
+    inline = [
+      "ping google.com -c 1",
+      "mkdir -p ~/.ssh",
+      "echo '${file("C:/Users/nvino/.ssh/id_rsa")}' > ~/.ssh/private_key",
+      "chmod 600 ~/.ssh/private_key",
 
-  # Install httpd on application-node1
-  "ssh -o StrictHostKeyChecking=no -i ~/.ssh/private_key opc@${oci_core_instance.application_node1.private_ip} 'sudo yum install -y httpd'",
-  "ssh -o StrictHostKeyChecking=no -i ~/.ssh/private_key opc@${oci_core_instance.application_node1.private_ip} 'sudo systemctl enable httpd'",
-  "ssh -o StrictHostKeyChecking=no -i ~/.ssh/private_key opc@${oci_core_instance.application_node1.private_ip} 'sudo systemctl start httpd'",
-  "ssh -o StrictHostKeyChecking=no -i ~/.ssh/private_key opc@${oci_core_instance.application_node1.private_ip} 'sudo firewall-cmd --permanent --add-port=80/tcp'",
-  "ssh -o StrictHostKeyChecking=no -i ~/.ssh/private_key opc@${oci_core_instance.application_node1.private_ip} 'sudo firewall-cmd --reload'",
+      # Install httpd on application-node1
+      "ssh -o StrictHostKeyChecking=no -i ~/.ssh/private_key opc@${oci_core_instance.application_node1.private_ip} 'sudo yum install -y httpd'",
+      "ssh -o StrictHostKeyChecking=no -i ~/.ssh/private_key opc@${oci_core_instance.application_node1.private_ip} 'sudo systemctl enable httpd'",
+      "ssh -o StrictHostKeyChecking=no -i ~/.ssh/private_key opc@${oci_core_instance.application_node1.private_ip} 'sudo systemctl start httpd'",
+      "ssh -o StrictHostKeyChecking=no -i ~/.ssh/private_key opc@${oci_core_instance.application_node1.private_ip} 'sudo firewall-cmd --permanent --add-port=80/tcp'",
+      "ssh -o StrictHostKeyChecking=no -i ~/.ssh/private_key opc@${oci_core_instance.application_node1.private_ip} 'sudo firewall-cmd --reload'",
 
-  # Edit httpd.conf
-  "ssh -o StrictHostKeyChecking=no -i ~/.ssh/private_key opc@${oci_core_instance.application_node1.private_ip} 'sudo sed -i \"s|<Directory \\\"/var/www/html\\\">|AddHandler cgi-script .sh\\n<Directory \\\"/var/www/html\\\">|g\" /etc/httpd/conf/httpd.conf'",
-  "ssh -o StrictHostKeyChecking=no -i ~/.ssh/private_key opc@${oci_core_instance.application_node1.private_ip} 'sudo sed -i \"s|Options Indexes FollowSymLinks|Options +ExecCGI|g\" /etc/httpd/conf/httpd.conf'",
-  "ssh -o StrictHostKeyChecking=no -i ~/.ssh/private_key opc@${oci_core_instance.application_node1.private_ip} 'sudo sed -i \"s|DirectoryIndex index.html|DirectoryIndex index.sh|g\" /etc/httpd/conf/httpd.conf'",
+      # Edit httpd.conf
+      "ssh -o StrictHostKeyChecking=no -i ~/.ssh/private_key opc@${oci_core_instance.application_node1.private_ip} 'sudo sed -i \"s|<Directory \\\"/var/www/html\\\">|AddHandler cgi-script .sh\\n<Directory \\\"/var/www/html\\\">|g\" /etc/httpd/conf/httpd.conf'",
+      "ssh -o StrictHostKeyChecking=no -i ~/.ssh/private_key opc@${oci_core_instance.application_node1.private_ip} 'sudo sed -i \"s|Options Indexes FollowSymLinks|Options +ExecCGI|g\" /etc/httpd/conf/httpd.conf'",
+      "ssh -o StrictHostKeyChecking=no -i ~/.ssh/private_key opc@${oci_core_instance.application_node1.private_ip} 'sudo sed -i \"s|DirectoryIndex index.html|DirectoryIndex index.sh|g\" /etc/httpd/conf/httpd.conf'",
 
-  # Disable SELinux
-  "ssh -o StrictHostKeyChecking=no -i ~/.ssh/private_key opc@${oci_core_instance.application_node1.private_ip} 'sudo sed -i \"s/^SELINUX=enforcing/SELINUX=disabled/\" /etc/selinux/config'",
-  "ssh -o StrictHostKeyChecking=no -i ~/.ssh/private_key opc@${oci_core_instance.application_node1.private_ip} 'sudo setenforce 0'",
+      # Disable SELinux
+      "ssh -o StrictHostKeyChecking=no -i ~/.ssh/private_key opc@${oci_core_instance.application_node1.private_ip} 'sudo sed -i \"s/^SELINUX=enforcing/SELINUX=disabled/\" /etc/selinux/config'",
+      "ssh -o StrictHostKeyChecking=no -i ~/.ssh/private_key opc@${oci_core_instance.application_node1.private_ip} 'sudo setenforce 0'",
 
-  # Create index.sh
-  "ssh -o StrictHostKeyChecking=no -i ~/.ssh/private_key opc@${oci_core_instance.application_node1.private_ip} 'printf \"#!/bin/sh\\necho Content-type: text/html\\necho\\necho \\\"<html>\\\"\\necho \\\"<head><title>Application</title></head>\\\"\\necho \\\"<body>\\\"\\necho \\\"<p>This application is running on <b><u>\\$(hostname)</u></b>!</p>\\\"\\necho \\\"</body></html>\\\"\\n\" | sudo tee /var/www/html/index.sh'",
+      # Create index.sh
+      "ssh -o StrictHostKeyChecking=no -i ~/.ssh/private_key opc@${oci_core_instance.application_node1.private_ip} 'printf \"#!/bin/sh\\necho Content-type: text/html\\necho\\necho \\\"<html>\\\"\\necho \\\"<head><title>Application</title></head>\\\"\\necho \\\"<body>\\\"\\necho \\\"<p>This application is running on <b><u>\\$(hostname)</u></b>!</p>\\\"\\necho \\\"</body></html>\\\"\\n\" | sudo tee /var/www/html/index.sh'",
 
-  # Permission
-  "ssh -o StrictHostKeyChecking=no -i ~/.ssh/private_key opc@${oci_core_instance.application_node1.private_ip} 'sudo chmod +x /var/www/html/index.sh'",
+      # Permission
+      "ssh -o StrictHostKeyChecking=no -i ~/.ssh/private_key opc@${oci_core_instance.application_node1.private_ip} 'sudo chmod +x /var/www/html/index.sh'",
 
-  # Restart httpd
-  "ssh -o StrictHostKeyChecking=no -i ~/.ssh/private_key opc@${oci_core_instance.application_node1.private_ip} 'sudo systemctl restart httpd'",
+      # Restart httpd
+      "ssh -o StrictHostKeyChecking=no -i ~/.ssh/private_key opc@${oci_core_instance.application_node1.private_ip} 'sudo systemctl restart httpd'",
 
-  # Remove old release package
-  "ssh -o StrictHostKeyChecking=no -i ~/.ssh/private_key opc@${oci_core_instance.application_node1.private_ip} 'sudo yum remove -y oracle-instantclient-release-26ai-el9'",
+      # Remove old release package
+      "ssh -o StrictHostKeyChecking=no -i ~/.ssh/private_key opc@${oci_core_instance.application_node1.private_ip} 'sudo yum remove -y oracle-instantclient-release-26ai-el9'",
 
-  # Install Oracle Instant Client repo
-  "ssh -o StrictHostKeyChecking=no -i ~/.ssh/private_key opc@${oci_core_instance.application_node1.private_ip} 'sudo yum install -y oracle-instantclient-release-el9.x86_64'",
+      # Install Oracle Instant Client repo
+      "ssh -o StrictHostKeyChecking=no -i ~/.ssh/private_key opc@${oci_core_instance.application_node1.private_ip} 'sudo yum install -y oracle-instantclient-release-el9.x86_64'",
 
-  # Install Instant Client packages
-  "ssh -o StrictHostKeyChecking=no -i ~/.ssh/private_key opc@${oci_core_instance.application_node1.private_ip} 'sudo yum install -y oracle-instantclient19.30-basic.x86_64'",
-  "ssh -o StrictHostKeyChecking=no -i ~/.ssh/private_key opc@${oci_core_instance.application_node1.private_ip} 'sudo yum install -y oracle-instantclient19.30-devel.x86_64'",
-  "ssh -o StrictHostKeyChecking=no -i ~/.ssh/private_key opc@${oci_core_instance.application_node1.private_ip} 'sudo yum install -y oracle-instantclient19.30-sqlplus.x86_64'",
+      # Install Instant Client packages
+      "ssh -o StrictHostKeyChecking=no -i ~/.ssh/private_key opc@${oci_core_instance.application_node1.private_ip} 'sudo yum install -y oracle-instantclient19.30-basic.x86_64'",
+      "ssh -o StrictHostKeyChecking=no -i ~/.ssh/private_key opc@${oci_core_instance.application_node1.private_ip} 'sudo yum install -y oracle-instantclient19.30-devel.x86_64'",
+      "ssh -o StrictHostKeyChecking=no -i ~/.ssh/private_key opc@${oci_core_instance.application_node1.private_ip} 'sudo yum install -y oracle-instantclient19.30-sqlplus.x86_64'",
 
-  # Verify installation
-  "ssh -o StrictHostKeyChecking=no -i ~/.ssh/private_key opc@${oci_core_instance.application_node1.private_ip} 'rpm -qa | grep oracle-instantclient'",
+      # Verify installation
+      "ssh -o StrictHostKeyChecking=no -i ~/.ssh/private_key opc@${oci_core_instance.application_node1.private_ip} 'rpm -qa | grep oracle-instantclient'",
 
-  # Set LD_LIBRARY_PATH
-  "ssh -o StrictHostKeyChecking=no -i ~/.ssh/private_key opc@${oci_core_instance.application_node1.private_ip} 'sudo sh -c \"echo export LD_LIBRARY_PATH=/usr/lib/oracle/19.30/client64/lib:\\$LD_LIBRARY_PATH >> /etc/bashrc\"'",
+      # Set LD_LIBRARY_PATH
+      "ssh -o StrictHostKeyChecking=no -i ~/.ssh/private_key opc@${oci_core_instance.application_node1.private_ip} 'sudo sh -c \"echo export LD_LIBRARY_PATH=/usr/lib/oracle/19.30/client64/lib:\\$LD_LIBRARY_PATH >> /etc/bashrc\"'",
 
-  # Oracle library config
-  "ssh -o StrictHostKeyChecking=no -i ~/.ssh/private_key opc@${oci_core_instance.application_node1.private_ip} 'sudo sh -c \"echo /usr/lib/oracle/19.30/client64/lib/ > /etc/ld.so.conf.d/oracle.conf\"'",
-  "ssh -o StrictHostKeyChecking=no -i ~/.ssh/private_key opc@${oci_core_instance.application_node1.private_ip} 'sudo ldconfig'",
+      # Oracle library config
+      "ssh -o StrictHostKeyChecking=no -i ~/.ssh/private_key opc@${oci_core_instance.application_node1.private_ip} 'sudo sh -c \"echo /usr/lib/oracle/19.30/client64/lib/ > /etc/ld.so.conf.d/oracle.conf\"'",
+      "ssh -o StrictHostKeyChecking=no -i ~/.ssh/private_key opc@${oci_core_instance.application_node1.private_ip} 'sudo ldconfig'",
 
-  # Check admin directory
-  "ssh -o StrictHostKeyChecking=no -i ~/.ssh/private_key opc@${oci_core_instance.application_node1.private_ip} 'cd /usr/lib/oracle/19.30/client64/lib/network/admin && ls'",
+      # Check admin directory
+      "ssh -o StrictHostKeyChecking=no -i ~/.ssh/private_key opc@${oci_core_instance.application_node1.private_ip} 'cd /usr/lib/oracle/19.30/client64/lib/network/admin && ls'",
 
-  # Remove old wallet
-  "ssh -o StrictHostKeyChecking=no -i ~/.ssh/private_key opc@${oci_core_instance.application_node1.private_ip} 'sudo rm -f /usr/lib/oracle/19.30/client64/lib/network/admin/wallet.zip'",
+      # Remove old wallet
+      "ssh -o StrictHostKeyChecking=no -i ~/.ssh/private_key opc@${oci_core_instance.application_node1.private_ip} 'sudo rm -f /usr/lib/oracle/19.30/client64/lib/network/admin/wallet.zip'",
 
-  # Download wallet directly using Terraform-interpolated URL (no cat/scp needed)
-  "ssh -o StrictHostKeyChecking=no -i ~/.ssh/private_key opc@${oci_core_instance.application_node1.private_ip} 'curl -L -o /tmp/wallet.zip \"https://objectstorage.ap-sydney-1.oraclecloud.com${oci_objectstorage_preauthrequest.wallet_par.access_uri}\"'",
+      # Download wallet directly using Terraform-interpolated URL (no cat/scp needed)
+      "ssh -o StrictHostKeyChecking=no -i ~/.ssh/private_key opc@${oci_core_instance.application_node1.private_ip} 'curl -L -o /tmp/wallet.zip \"https://objectstorage.ap-sydney-1.oraclecloud.com${oci_objectstorage_preauthrequest.wallet_par.access_uri}\"'",
 
-  # Move wallet using sudo
-  "ssh -o StrictHostKeyChecking=no -i ~/.ssh/private_key opc@${oci_core_instance.application_node1.private_ip} 'sudo mv /tmp/wallet.zip /usr/lib/oracle/19.30/client64/lib/network/admin/'",
+      # Move wallet using sudo
+      "ssh -o StrictHostKeyChecking=no -i ~/.ssh/private_key opc@${oci_core_instance.application_node1.private_ip} 'sudo mv /tmp/wallet.zip /usr/lib/oracle/19.30/client64/lib/network/admin/'",
 
-  # Unzip wallet using sudo
-  "ssh -o StrictHostKeyChecking=no -i ~/.ssh/private_key opc@${oci_core_instance.application_node1.private_ip} 'cd /usr/lib/oracle/19.30/client64/lib/network/admin && sudo unzip -o wallet.zip'",
+      # Unzip wallet using sudo
+      "ssh -o StrictHostKeyChecking=no -i ~/.ssh/private_key opc@${oci_core_instance.application_node1.private_ip} 'cd /usr/lib/oracle/19.30/client64/lib/network/admin && sudo unzip -o wallet.zip'",
 
-  # Fix permissions
-  "ssh -o StrictHostKeyChecking=no -i ~/.ssh/private_key opc@${oci_core_instance.application_node1.private_ip} 'sudo chmod 644 /usr/lib/oracle/19.30/client64/lib/network/admin/*'",
+      # Fix permissions
+      "ssh -o StrictHostKeyChecking=no -i ~/.ssh/private_key opc@${oci_core_instance.application_node1.private_ip} 'sudo chmod 644 /usr/lib/oracle/19.30/client64/lib/network/admin/*'",
 
-  # Verify wallet files
-  "ssh -o StrictHostKeyChecking=no -i ~/.ssh/private_key opc@${oci_core_instance.application_node1.private_ip} 'ls /usr/lib/oracle/19.30/client64/lib/network/admin'",
+      # Verify wallet files
+      "ssh -o StrictHostKeyChecking=no -i ~/.ssh/private_key opc@${oci_core_instance.application_node1.private_ip} 'ls /usr/lib/oracle/19.30/client64/lib/network/admin'",
 
-  "ssh -o StrictHostKeyChecking=no -i ~/.ssh/private_key opc@${oci_core_instance.application_node1.private_ip} 'export TNS_ADMIN=/usr/lib/oracle/19.30/client64/lib/network/admin && echo \"SELECT PROD_NAME, PROD_DESC FROM SH.PRODUCTS ORDER BY PROD_NAME;\nEXIT;\" | /usr/lib/oracle/19.30/client64/bin/sqlplus -s ADMIN/Oracle123456@MYAUTONOMOUSDBTF_high'",  
+      "ssh -o StrictHostKeyChecking=no -i ~/.ssh/private_key opc@${oci_core_instance.application_node1.private_ip} 'export TNS_ADMIN=/usr/lib/oracle/19.30/client64/lib/network/admin && echo \"SELECT PROD_NAME, PROD_DESC FROM SH.PRODUCTS ORDER BY PROD_NAME;\nEXIT;\" | /usr/lib/oracle/19.30/client64/bin/sqlplus -s ADMIN/Oracle123456@MYAUTONOMOUSDBTF_high'",
 
-  # Replace index.sh with DB query version
-  "ssh -o StrictHostKeyChecking=no -i ~/.ssh/private_key opc@${oci_core_instance.application_node1.private_ip} 'sudo bash -c \"cat > /var/www/html/index.sh << ENDOFSCRIPT\n#!/bin/sh\necho Content-type: text/html\necho\necho \\\"<html>\\\"\necho \\\"<head><title>Application</title></head>\\\"\necho \\\"<body>\\\"\necho \\\"<p>This application is running on <b><u>\\$(hostname)</u></b>!</p>\\\"\nexport TNS_ADMIN=/usr/lib/oracle/19.30/client64/lib/network/admin\nexport LD_LIBRARY_PATH=/usr/lib/oracle/19.30/client64/lib\n/usr/lib/oracle/19.30/client64/bin/sqlplus -s ADMIN/Oracle123456@myautonomousdbtf_high <<EOF\nSET MARKUP HTML ON\nSET FEEDBACK OFF\nSET PAGESIZE 50\nSELECT PROD_NAME, PROD_DESC FROM SH.PRODUCTS ORDER BY PROD_NAME;\nQUIT\nEOF\necho \\\"</body></html>\\\"\nENDOFSCRIPT\"'",
+      # Replace index.sh with DB query version
+      "ssh -o StrictHostKeyChecking=no -i ~/.ssh/private_key opc@${oci_core_instance.application_node1.private_ip} 'sudo bash -c \"cat > /var/www/html/index.sh << ENDOFSCRIPT\n#!/bin/sh\necho Content-type: text/html\necho\necho \\\"<html>\\\"\necho \\\"<head><title>Application</title></head>\\\"\necho \\\"<body>\\\"\necho \\\"<p>This application is running on <b><u>\\$(hostname)</u></b>!</p>\\\"\nexport TNS_ADMIN=/usr/lib/oracle/19.30/client64/lib/network/admin\nexport LD_LIBRARY_PATH=/usr/lib/oracle/19.30/client64/lib\n/usr/lib/oracle/19.30/client64/bin/sqlplus -s ADMIN/Oracle123456@myautonomousdbtf_high <<EOF\nSET MARKUP HTML ON\nSET FEEDBACK OFF\nSET PAGESIZE 50\nSELECT PROD_NAME, PROD_DESC FROM SH.PRODUCTS ORDER BY PROD_NAME;\nQUIT\nEOF\necho \\\"</body></html>\\\"\nENDOFSCRIPT\"'",
 
-  # Give execute permission
-  "ssh -o StrictHostKeyChecking=no -i ~/.ssh/private_key opc@${oci_core_instance.application_node1.private_ip} 'sudo chmod +x /var/www/html/index.sh'",
+      # Give execute permission
+      "ssh -o StrictHostKeyChecking=no -i ~/.ssh/private_key opc@${oci_core_instance.application_node1.private_ip} 'sudo chmod +x /var/www/html/index.sh'",
 
-  # Restart httpd
-  "ssh -o StrictHostKeyChecking=no -i ~/.ssh/private_key opc@${oci_core_instance.application_node1.private_ip} 'sudo systemctl restart httpd'",
+      # Restart httpd
+      "ssh -o StrictHostKeyChecking=no -i ~/.ssh/private_key opc@${oci_core_instance.application_node1.private_ip} 'sudo systemctl restart httpd'",
 
-  # Test
-  "ssh -o StrictHostKeyChecking=no -i ~/.ssh/private_key opc@${oci_core_instance.application_node1.private_ip} 'curl http://localhost:80'",
-]
-connection {
+      # Test
+      "ssh -o StrictHostKeyChecking=no -i ~/.ssh/private_key opc@${oci_core_instance.application_node1.private_ip} 'curl http://localhost:80'",
+    ]
+    connection {
       type        = "ssh"
       user        = "opc"
       private_key = file("C:/Users/nvino/.ssh/id_rsa")
@@ -531,10 +531,10 @@ resource "null_resource" "start_application_node1" {
 #CREATING APPLICATION NODE2 TF
 resource "oci_core_instance" "application_node2" {
 
-  compartment_id = var.compartment_ocid
+  compartment_id      = var.compartment_ocid
   availability_domain = "eaWm:AP-SYDNEY-1-AD-1"
-  display_name = "application-node2-tf"
-  shape = "VM.Standard.E5.Flex"
+  display_name        = "application-node2-tf"
+  shape               = "VM.Standard.E5.Flex"
   shape_config {
     ocpus         = 1
     memory_in_gbs = 12
