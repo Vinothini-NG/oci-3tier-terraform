@@ -1,0 +1,11 @@
+﻿.terraform/
+*.tfstate
+*.tfstate.*
+.terraform.lock.hcl
+terraform.tfvars
+wallet.zip
+par-url.txt
+*.pem
+*.key
+id_rsa
+id_rsa.pub
