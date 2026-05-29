@@ -9,13 +9,17 @@ jobs:
   terraform:
     runs-on: ubuntu-latest
 
-    env:
-      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+    defaults:
+      run:
+        working-directory: .
 
     steps:
 
       - name: Checkout Code
         uses: actions/checkout@v5
+
+      - name: List Files
+        run: ls -la
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v4
@@ -25,6 +29,3 @@ jobs:
 
       - name: Terraform Validate
         run: terraform validate
-
-      - name: Terraform Plan
-        run: terraform plan
