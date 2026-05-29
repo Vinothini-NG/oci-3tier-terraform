@@ -1,0 +1,6 @@
+tenancy_ocid     = "ocid1.tenancy.oc1..aaaaaaaa4t75czg2jdtaodsz5du2yc7dqra76uiesnjthmwqxomomd3tin4q"
+user_ocid        = "ocid1.user.oc1..aaaaaaaafrbseeoaoa4mq2hdbuwyyq2xvfbx4q4sjf55ezxyxr4yntq5qmbq"
+fingerprint      = "32:01:9d:54:c8:6c:04:88:ec:4e:0c:fb:b3:c6:17:26"
+private_key_path = "C:/Users/nvino/.oci/oci_api_key.pem"
+region           = "ap-sydney-1"
+compartment_ocid = "ocid1.compartment.oc1..aaaaaaaahy3fz45mjw2mwdaywfmoktvrjpvdaysh7uynlp5kuqd7zkncp2bq"

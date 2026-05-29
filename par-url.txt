@@ -1,0 +1,1 @@
+https://objectstorage.ap-sydney-1.oraclecloud.com/p/3aecnJACU1AnmD1tmamFrUbFt2zf4x-uVoE4ZUqt_hGo91GSNbpfsQgp-ZPmbbZf/n/sdlvq8nmuuve/b/terraform-bucket-tf/o/wallet.zip
