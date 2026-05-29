@@ -125,7 +125,7 @@ resource "oci_core_instance" "bastion_host" {
   }
 
   metadata = {
-    ssh_authorized_keys = file("C:/Users/nvino/.ssh/id_rsa.pub")
+    ssh_authorized_keys = file("${path.module}/id_rsa.pub")
   }
 }
 
@@ -256,7 +256,7 @@ resource "oci_core_instance" "application_node1" {
   }
 
   metadata = {
-    ssh_authorized_keys = file("C:/Users/nvino/.ssh/id_rsa.pub")
+    ssh_authorized_keys = file("${path.module}/id_rsa.pub")
   }
 }
 
@@ -554,7 +554,7 @@ resource "oci_core_instance" "application_node2" {
   }
 
   metadata = {
-    ssh_authorized_keys = file("C:/Users/nvino/.ssh/id_rsa.pub")
+    ssh_authorized_keys = file("${path.module}/id_rsa.pub")
   }
 
   depends_on = [
