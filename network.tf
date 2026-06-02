@@ -264,7 +264,7 @@ resource "oci_core_instance" "application_node1_github" {
 resource "oci_database_autonomous_database" "autonomous_db_tf_github" {
   compartment_id = var.compartment_ocid
   display_name   = "autonomous_db_tf_github"
-  db_name        = "MYAUTONOMOUSDBTF"
+  db_name        = "MYAUTONOMOUSDBTFGITHUB"
   db_workload    = "OLTP"
   admin_password = "Oracle123456"
   is_free_tier   = true
