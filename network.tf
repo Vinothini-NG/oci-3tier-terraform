@@ -304,9 +304,11 @@ resource "oci_objectstorage_object" "wallet_upload_github" {
   bucket    = oci_objectstorage_bucket.tf_bucket_github.name
   object    = "wallet.zip"
 
-  source = "${path.module}/wallet.zip"
+  source = local_file.wallet_zip_github.filename
 
-  depends_on = [local_file.wallet_zip_github]
+  depends_on = [
+    local_file.wallet_zip_github
+  ]
 }
 
 # CREATE PRE-AUTHENTICATED REQUEST (PAR)
