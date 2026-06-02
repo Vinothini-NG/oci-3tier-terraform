@@ -301,7 +301,7 @@ resource "null_resource" "check_wallet" {
 
 resource "oci_objectstorage_bucket" "tf_bucket_github" {
   compartment_id = var.compartment_ocid
-  name           = "terraform-bucket-tf-github-v2"
+  name           = "terraform-bucket-tf-github-v1"
   namespace      = data.oci_objectstorage_namespace.ns.namespace
   access_type    = "NoPublicAccess"
   storage_tier   = "Standard"
