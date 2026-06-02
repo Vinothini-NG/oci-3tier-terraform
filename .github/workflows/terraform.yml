@@ -10,15 +10,21 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-
       - name: Checkout Code
         uses: actions/checkout@v5
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v4
 
+      - name: Create OCI API Key
+        run: |
+          cat <<EOF > oci_api_key.pem
+          ${{ secrets.OCI_API_PRIVATE_KEY }}
+          EOF
+          chmod 600 oci_api_key.pem
+
       - name: Terraform Init
         run: terraform init
 
-      - name: Terraform Format Check
-        run: terraform fmt -check
+      - name: Terraform Validate
+        run: terraform validate
