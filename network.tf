@@ -279,7 +279,7 @@ resource "oci_database_autonomous_database_wallet" "adb_wallet" {
 
 # SAVE WALLET ZIP LOCALLY
 resource "local_file" "wallet_zip" {
-  filename       = "C:/terraform/oci-3tier/wallet.zip"
+  filename       = "${path.module}/wallet.zip"
   content_base64 = oci_database_autonomous_database_wallet.adb_wallet.content
 }
 
@@ -298,7 +298,7 @@ resource "oci_objectstorage_object" "wallet_upload" {
   bucket    = oci_objectstorage_bucket.tf_bucket.name
   object    = "wallet.zip"
 
-  source = local_file.wallet_zip.filename
+  source = "${path.module}/wallet.zip"
 
   depends_on = [local_file.wallet_zip]
 }
