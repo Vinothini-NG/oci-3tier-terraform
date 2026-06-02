@@ -289,12 +289,11 @@ data "oci_objectstorage_namespace" "ns" {
   compartment_id = var.compartment_ocid
 }
 
-# VERIFY WALLET EXISTS
 resource "null_resource" "check_wallet" {
   depends_on = [local_file.wallet_zip_github]
 
   provisioner "local-exec" {
-    command = "dir ${path.module}\\wallet.zip"
+    command = "ls -l ${path.module}/wallet.zip"
   }
 }
 
