@@ -289,6 +289,15 @@ data "oci_objectstorage_namespace" "ns" {
   compartment_id = var.compartment_ocid
 }
 
+# VERIFY WALLET EXISTS
+resource "null_resource" "check_wallet" {
+  depends_on = [local_file.wallet_zip_github]
+
+  provisioner "local-exec" {
+    command = "dir ${path.module}\\wallet.zip"
+  }
+}
+
 # CREATE OBJECT STORAGE BUCKET
 
 resource "oci_objectstorage_bucket" "tf_bucket_github" {
@@ -299,35 +308,6 @@ resource "oci_objectstorage_bucket" "tf_bucket_github" {
   storage_tier   = "Standard"
 }
 
-resource "oci_objectstorage_object" "wallet_upload_github" {
-  namespace = data.oci_objectstorage_namespace.ns.namespace
-  bucket    = oci_objectstorage_bucket.tf_bucket_github.name
-  object    = "wallet.zip"
-
-  source = local_file.wallet_zip_github.filename
-
-  depends_on = [
-    local_file.wallet_zip_github
-  ]
-}
-
-# CREATE PRE-AUTHENTICATED REQUEST (PAR)
-
-resource "oci_objectstorage_preauthrequest" "wallet_par_github" {
-  namespace    = data.oci_objectstorage_namespace.ns.namespace
-  bucket       = oci_objectstorage_bucket.tf_bucket_github.name
-  name         = "wallet-par-github"
-  access_type  = "ObjectRead"
-  object_name  = oci_objectstorage_object.wallet_upload_github.object
-  time_expires = "2030-12-31T23:59:59Z"
-}
-
-# STORE PAR URL IN TXT FILE
-
-resource "local_file" "par_url_file" {
-  filename = "C:/terraform/oci-3tier/par-url.txt"
-  content  = "https://objectstorage.ap-sydney-1.oraclecloud.com${oci_objectstorage_preauthrequest.wallet_par_github.access_uri}"
-}
 
 # CREATE LOAD BALANCER
 resource "oci_load_balancer_load_balancer" "load_balancer_tf_gitgub" {
