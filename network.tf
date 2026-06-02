@@ -263,8 +263,8 @@ resource "oci_core_instance" "application_node1_github" {
 # CREATE AUTONOMOUS DATABASE
 resource "oci_database_autonomous_database" "autonomous_db_tf_github" {
   compartment_id = var.compartment_ocid
-  display_name   = "autonomous_db_tf_github"
-  db_name        = "MYAUTONOMOUSDBTFGITHUB"
+  display_name   = "autonomous_db_tf_github_v2"
+  db_name        = "MYAUTONOMOUSDBTFGITHUB2"
   db_workload    = "OLTP"
   admin_password = "Oracle123456"
   is_free_tier   = true
@@ -293,7 +293,7 @@ data "oci_objectstorage_namespace" "ns" {
 
 resource "oci_objectstorage_bucket" "tf_bucket_github" {
   compartment_id = var.compartment_ocid
-  name           = "terraform-bucket-tf-github"
+  name           = "terraform-bucket-tf-github-v2"
   namespace      = data.oci_objectstorage_namespace.ns.namespace
   access_type    = "NoPublicAccess"
   storage_tier   = "Standard"
