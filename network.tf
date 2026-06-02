@@ -283,6 +283,12 @@ resource "local_file" "wallet_zip_github" {
   content_base64 = oci_database_autonomous_database_wallet.adb_wallet_github.content
 }
 
+# GET OBJECT STORAGE NAMESPACE
+
+data "oci_objectstorage_namespace" "ns" {
+  compartment_id = var.compartment_ocid
+}
+
 # CREATE OBJECT STORAGE BUCKET
 
 resource "oci_objectstorage_bucket" "tf_bucket_github" {
@@ -301,12 +307,6 @@ resource "oci_objectstorage_object" "wallet_upload_github" {
   source = "${path.module}/wallet.zip"
 
   depends_on = [local_file.wallet_zip_github]
-}
-
-# GET OBJECT STORAGE NAMESPACE
-
-data "oci_objectstorage_namespace" "ns" {
-  compartment_id = var.compartment_ocid
 }
 
 # CREATE PRE-AUTHENTICATED REQUEST (PAR)
