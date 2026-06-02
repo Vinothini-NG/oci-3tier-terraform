@@ -23,6 +23,14 @@ jobs:
           EOF
           chmod 600 oci_api_key.pem
 
+      - name: Set OCI Environment Variables
+        run: |
+          echo "TF_VAR_tenancy_ocid=${{ secrets.OCI_TENANCY_OCID }}" >> $GITHUB_ENV
+          echo "TF_VAR_user_ocid=${{ secrets.OCI_USER_OCID }}" >> $GITHUB_ENV
+          echo "TF_VAR_fingerprint=${{ secrets.OCI_FINGERPRINT }}" >> $GITHUB_ENV
+          echo "TF_VAR_region=${{ secrets.OCI_REGION }}" >> $GITHUB_ENV
+          echo "TF_VAR_private_key_path=./oci_api_key.pem" >> $GITHUB_ENV
+
       - name: Terraform Init
         run: terraform init
 
